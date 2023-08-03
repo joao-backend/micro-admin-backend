@@ -80,4 +80,18 @@ export class CategoriasController {
       }
     }
   }
+
+  @MessagePattern('deletar-categoria')
+  async deletarCategoria(
+    @Payload() _id: string,
+    @Ctx() context: RmqContext,
+  ) {
+    const channel = context.getChannelRef();
+    const originalMsg = context.getMessage();
+    try {
+      return await this.categoriaService.deletarCategoria(_id)
+    } finally {
+      await channel.ack(originalMsg);
+    }
+  }
 }

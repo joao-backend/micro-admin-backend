@@ -1,15 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Categoria } from './intefaces/categoria.interface';
-import { Jogador } from 'src/jogadores/interfaces/jogador.interface';
 import { Model } from 'mongoose';
 import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 export class CategoriasService {
   constructor(
-    @InjectModel('Categoria') private readonly categoriaModel: Model<Categoria>,
-    @InjectModel('Jogador') private readonly jogadorModel: Model<Jogador>,
+    @InjectModel('Categoria') private readonly categoriaModel: Model<Categoria>
   ) {}
 
   private logger = new Logger(CategoriasService.name);
@@ -47,6 +45,17 @@ export class CategoriasService {
       console.log(_id);
       await this.categoriaModel
         .findOneAndUpdate({ _id }, { $set: categoria })
+        .exec();
+    } catch (error) {
+      this.logger.error(`error: ${JSON.stringify(error.message)}`);
+      throw new RpcException(error.message);
+    }
+  }
+
+  async deletarCategoria(_id: string) {
+    try {
+      await this.categoriaModel
+        .deleteOne({ _id })
         .exec();
     } catch (error) {
       this.logger.error(`error: ${JSON.stringify(error.message)}`);
